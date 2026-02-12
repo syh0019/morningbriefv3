@@ -183,7 +183,7 @@ morningbriefv3/
 | `OPENAI_API_KEY` | OpenAI API 키 | [OpenAI Platform](https://platform.openai.com/api-keys) |
 | `WEATHER_API_KEY` | OpenWeatherMap API 키 | [OpenWeatherMap](https://openweathermap.org/api) |
 | `EMAIL_FROM` | 발신 이메일 주소 | Gmail 주소 |
-| `EMAIL_TO` | 수신 이메일 주소 | 수신자 이메일 |
+| `TO_EMAILS` | 수신 이메일 주소 | 수신자 이메일 |
 | `PAGES_URL` | GitHub Pages URL | `https://[username].github.io/morningbriefv3` |
 
 ---

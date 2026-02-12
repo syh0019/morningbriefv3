@@ -28,7 +28,7 @@ function validateEnvironment() {
     'GOOGLE_REFRESH_TOKEN',
     'OPENAI_API_KEY',
     'WEATHER_API_KEY',
-    'EMAIL_TO',
+    'TO_EMAILS',
     'EMAIL_FROM'
   ];
   
@@ -189,7 +189,7 @@ async function main() {
     };
 
     // GitHub Pages URL 설정 (환경변수로 주입 가능)
-    const baseUrl = process.env.GITHUB_PAGES_URL || process.env.PAGES_URL || 'https://your-username.github.io/morningbriefv3';
+    const baseUrl = process.env.PAGES_URL || 'https://your-username.github.io/morningbriefv3';
     
     let audioUrl = null;
     let webUrl = null;

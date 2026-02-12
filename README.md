@@ -102,7 +102,7 @@ WEATHER_API_KEY=your_weather_api_key
 
 # Email
 EMAIL_FROM=your-email@gmail.com
-EMAIL_TO=recipient@example.com
+TO_EMAILS=recipient@example.com
 
 # GitHub Pages URL
 PAGES_URL=https://your-username.github.io/morningbriefv3
@@ -137,7 +137,7 @@ GitHub 저장소 → Settings → Secrets and variables → Actions에서 다음
 - `OPENAI_API_KEY`
 - `WEATHER_API_KEY`
 - `EMAIL_FROM`
-- `EMAIL_TO`
+- `TO_EMAILS`
 - `PAGES_URL`
 
 ### 6. GitHub Pages 활성화

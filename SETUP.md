@@ -98,7 +98,7 @@ WEATHER_API_KEY=your_weather_api_key_here
 
 # Email
 EMAIL_FROM=your-email@gmail.com
-EMAIL_TO=your-email@gmail.com
+TO_EMAILS=your-email@gmail.com
 
 # GitHub Pages (나중에 설정)
 PAGES_URL=https://your-username.github.io/morningbriefv3
@@ -158,7 +158,7 @@ git push -u origin main
 | `OPENAI_API_KEY` | OpenAI API 키 |
 | `WEATHER_API_KEY` | OpenWeatherMap API 키 |
 | `EMAIL_FROM` | 발신 이메일 |
-| `EMAIL_TO` | 수신 이메일 |
+| `TO_EMAILS` | 수신 이메일 |
 | `PAGES_URL` | `https://[username].github.io/morningbriefv3` |
 
 ### 5.3 GitHub Pages 활성화
