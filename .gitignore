@@ -1,6 +1,6 @@
 # Dependencies
 node_modules/
-package-lock.json
+# package-lock.json은 버전 관리에 포함 (GitHub Actions cache를 위해 필요)
 
 # Environment variables
 .env
