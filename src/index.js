@@ -19,6 +19,36 @@ import { logger } from './utils/logger.js';
 import { getNowKST, formatDateKorean } from './utils/dateUtils.js';
 
 /**
+ * 환경 변수 검증
+ */
+function validateEnvironment() {
+  const required = [
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET',
+    'GOOGLE_REFRESH_TOKEN',
+    'OPENAI_API_KEY',
+    'WEATHER_API_KEY',
+    'EMAIL_TO',
+    'EMAIL_FROM'
+  ];
+  
+  const missing = required.filter(key => !process.env[key]);
+  
+  if (missing.length > 0) {
+    logger.error('❌ 필수 환경 변수가 설정되지 않았습니다:');
+    missing.forEach(key => {
+      logger.error(`  - ${key}`);
+    });
+    logger.info('\n💡 GitHub Secrets에서 다음 변수들을 설정해주세요:');
+    logger.info('   Repository Settings > Secrets and variables > Actions > New repository secret');
+    return false;
+  }
+  
+  logger.success('✓ 모든 필수 환경 변수가 설정되었습니다.');
+  return true;
+}
+
+/**
  * 메인 실행 함수
  */
 async function main() {
@@ -30,12 +60,29 @@ async function main() {
   logger.info(`📅 날짜: ${formatDateKorean(now)}`);
   logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
+  // 환경 변수 검증
+  logger.info('\n[0/7] 환경 변수 검증...');
+  if (!validateEnvironment()) {
+    logger.error('\n❌ 환경 변수 검증 실패');
+    process.exit(1);
+  }
+
+  // 실패한 단계 추적
+  const failures = [];
+  
   try {
     // 1. OAuth 인증
     logger.info('\n[1/7] Google OAuth2 인증 시작...');
     const auth = createOAuth2Client();
-    await ensureValidToken(auth);
-    logger.success('✓ OAuth 인증 완료');
+    
+    try {
+      await ensureValidToken(auth);
+      logger.success('✓ OAuth 인증 완료');
+    } catch (error) {
+      logger.error('✗ OAuth 인증 실패', error);
+      failures.push({ step: 'OAuth 인증', error: error.message });
+      throw error; // OAuth 실패는 치명적이므로 중단
+    }
 
     // 2. 데이터 수집 (병렬 실행)
     logger.info('\n[2/7] 데이터 수집 시작...');
@@ -64,18 +111,32 @@ async function main() {
     logger.info(`  - 캘린더: ${calendar ? `✓ (오늘 ${calendar.today.length}건, 내일 ${calendar.tomorrow.length}건)` : '✗'}`);
     logger.info(`  - Gmail: ${emails ? `✓ (${emails.length}건)` : '✗'}`);
     logger.info(`  - 뉴스: ${newsData ? `✓ (${newsData.all.length}건)` : '✗'}`);
+    
+    // 데이터 수집 실패 추적
+    if (!weather) failures.push({ step: '날씨 조회', error: '날씨 데이터를 가져올 수 없습니다' });
+    if (!calendar) failures.push({ step: '캘린더 조회', error: '캘린더 데이터를 가져올 수 없습니다' });
+    if (!emails) failures.push({ step: 'Gmail 조회', error: 'Gmail 데이터를 가져올 수 없습니다' });
+    if (!newsData) failures.push({ step: '뉴스 수집', error: '뉴스 데이터를 가져올 수 없습니다' });
 
     // 3. OpenAI 요약 생성
     logger.info('\n[3/7] OpenAI 요약 생성 시작...');
     
     let newsSummary = null;
     if (newsData && newsData.all.length > 0) {
-      const newsText = formatNewsForSummary(newsData);
-      newsSummary = await summarizeNews(newsText);
-      if (newsSummary) {
-        logger.success(`✓ 뉴스 요약 완료 (${newsSummary.length}자)`);
-      } else {
-        logger.warn('⚠ 뉴스 요약 실패');
+      try {
+        const newsText = formatNewsForSummary(newsData);
+        newsSummary = await summarizeNews(newsText);
+        if (newsSummary) {
+          logger.success(`✓ 뉴스 요약 완료 (${newsSummary.length}자)`);
+        } else {
+          logger.warn('⚠ 뉴스 요약 실패');
+          newsSummary = '뉴스 요약을 생성할 수 없습니다.';
+          failures.push({ step: '뉴스 요약', error: 'OpenAI API 응답 없음' });
+        }
+      } catch (error) {
+        logger.error('⚠ 뉴스 요약 중 에러 발생', error);
+        newsSummary = '뉴스 요약을 생성할 수 없습니다.';
+        failures.push({ step: '뉴스 요약', error: error.message });
       }
     } else {
       logger.warn('⚠ 뉴스가 없어 요약을 건너뜁니다.');
@@ -84,24 +145,32 @@ async function main() {
 
     let gmailSummary = null;
     if (emails && emails.length > 0) {
-      // 환경변수로 요약 방식 선택 (기본값: 상세 요약)
-      const useBriefSummary = process.env.GMAIL_BRIEF_SUMMARY === 'true';
-      
-      if (useBriefSummary) {
-        gmailSummary = await summarizeEmailsBrief(emails);
-        if (gmailSummary) {
-          logger.success(`✓ Gmail 5줄 요약 완료 (${gmailSummary.length}자)`);
+      try {
+        // 환경변수로 요약 방식 선택 (기본값: 상세 요약)
+        const useBriefSummary = process.env.GMAIL_BRIEF_SUMMARY === 'true';
+        
+        if (useBriefSummary) {
+          gmailSummary = await summarizeEmailsBrief(emails);
+          if (gmailSummary) {
+            logger.success(`✓ Gmail 5줄 요약 완료 (${gmailSummary.length}자)`);
+          } else {
+            logger.warn('⚠ Gmail 5줄 요약 실패, 상세 요약으로 전환');
+            gmailSummary = await summarizeEmails(emails);
+          }
         } else {
-          logger.warn('⚠ Gmail 5줄 요약 실패, 상세 요약으로 전환');
           gmailSummary = await summarizeEmails(emails);
+          if (gmailSummary) {
+            logger.success(`✓ Gmail 상세 요약 완료 (${gmailSummary.length}자)`);
+          } else {
+            logger.warn('⚠ Gmail 요약 실패');
+            gmailSummary = 'Gmail 요약을 생성할 수 없습니다.';
+            failures.push({ step: 'Gmail 요약', error: 'OpenAI API 응답 없음' });
+          }
         }
-      } else {
-        gmailSummary = await summarizeEmails(emails);
-        if (gmailSummary) {
-          logger.success(`✓ Gmail 상세 요약 완료 (${gmailSummary.length}자)`);
-        } else {
-          logger.warn('⚠ Gmail 요약 실패');
-        }
+      } catch (error) {
+        logger.error('⚠ Gmail 요약 중 에러 발생', error);
+        gmailSummary = 'Gmail 요약을 생성할 수 없습니다.';
+        failures.push({ step: 'Gmail 요약', error: error.message });
       }
     } else {
       logger.info('미읽음 메일이 없습니다.');
@@ -163,18 +232,40 @@ async function main() {
 
     // 6. 이메일 발송
     logger.info('\n[6/7] 이메일 발송 시작...');
-    await sendEmail(auth, subject, htmlContent);
-    logger.success('✓ 이메일 발송 완료');
+    try {
+      await sendEmail(auth, subject, htmlContent);
+      logger.success('✓ 이메일 발송 완료');
+    } catch (error) {
+      logger.error('⚠ 이메일 발송 실패', error);
+      failures.push({ step: '이메일 발송', error: error.message });
+      // 이메일 발송 실패는 치명적이지 않으므로 계속 진행
+    }
 
     // 7. 실행 결과 요약
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
     logger.info('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    logger.success('🎉 Morning Briefing 완료!');
-    logger.info(`⏱️  실행 시간: ${elapsed}초`);
+    
+    if (failures.length === 0) {
+      logger.success('🎉 Morning Briefing 완료!');
+    } else {
+      logger.warn(`⚠️  Morning Briefing 완료 (${failures.length}개 단계 실패)`);
+      logger.info('\n실패한 단계:');
+      failures.forEach((failure, index) => {
+        logger.warn(`  ${index + 1}. ${failure.step}: ${failure.error}`);
+      });
+    }
+    
+    logger.info(`\n⏱️  실행 시간: ${elapsed}초`);
     if (webUrl) logger.info(`🌐 웹: ${webUrl}`);
     if (audioUrl) logger.info(`🎧 오디오: ${audioUrl}`);
     logger.info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
+    // 일부 실패가 있어도 웹 페이지와 아카이브가 생성되었다면 성공으로 간주
+    // 단, OAuth나 치명적 에러는 이미 위에서 throw되어 catch 블록으로 이동
+    if (failures.length > 0) {
+      logger.warn('⚠️  일부 단계가 실패했지만 브리핑은 생성되었습니다.');
+    }
+    
     // 정상 종료
     process.exit(0);
 

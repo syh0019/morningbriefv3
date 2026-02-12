@@ -187,11 +187,11 @@ export async function generateAudioFile(data, outputPath) {
       scriptLength: script.length
     });
 
-    return true;
+    return { success: true, script };
 
   } catch (error) {
     logger.error('TTS 오디오 생성 실패', error);
-    return false;
+    return { success: false, script: null };
   }
 }
 

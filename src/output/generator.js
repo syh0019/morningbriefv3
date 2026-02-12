@@ -66,13 +66,13 @@ export async function generateAudio(data) {
 
     const outputPath = path.join(OUTPUT_DIR, 'today.mp3');
     
-    const success = await generateAudioFile(data, outputPath);
+    const result = await generateAudioFile(data, outputPath);
 
-    if (!success) {
+    if (!result.success) {
       throw new Error('오디오 생성 실패');
     }
 
-    return outputPath;
+    return { outputPath, script: result.script };
   } catch (error) {
     logger.error('오디오 파일 생성 실패', error);
     throw error;
@@ -82,7 +82,7 @@ export async function generateAudio(data) {
 /**
  * 날짜별 아카이브 생성 (선택)
  */
-export async function archiveBriefing(data, audioGenerated = false) {
+export async function archiveBriefing(data, audioGenerated = false, audioScript = null) {
   try {
     ensureOutputDirectory();
 
@@ -111,6 +111,13 @@ export async function archiveBriefing(data, audioGenerated = false) {
         fs.copyFileSync(mp3Path, archiveMp3Path);
         logger.info('MP3 아카이브 생성', { path: archiveMp3Path });
       }
+    }
+
+    // 대본(Transcript) 아카이브
+    if (audioScript) {
+      const archiveTranscriptPath = path.join(archiveDir, `${dateString}.txt`);
+      fs.writeFileSync(archiveTranscriptPath, audioScript, 'utf8');
+      logger.info('대본 아카이브 생성', { path: archiveTranscriptPath });
     }
 
     return archiveDir;
@@ -294,10 +301,13 @@ export async function generateAllOutputs(data, options = {}) {
 
     // 1. 오디오 파일 생성 (선택)
     let audioGenerated = false;
+    let audioScript = null;
     if (shouldGenerateAudio) {
       try {
         logger.info('\n[1/4] 오디오 파일 생성...');
-        results.audio = await generateAudio(data);
+        const audioResult = await generateAudio(data);
+        results.audio = audioResult.outputPath;
+        audioScript = audioResult.script;
         audioGenerated = true;
       } catch (error) {
         logger.error('⚠ 오디오 생성 실패 (계속 진행)', error);
@@ -318,7 +328,7 @@ export async function generateAllOutputs(data, options = {}) {
     // 4. 아카이브 생성 (선택)
     if (createArchive) {
       logger.info('\n[4/4] 아카이브 생성...');
-      results.archive = await archiveBriefing(data, audioGenerated);
+      results.archive = await archiveBriefing(data, audioGenerated, audioScript);
     } else {
       logger.info('\n[4/4] 아카이브 생성 건너뜀');
     }

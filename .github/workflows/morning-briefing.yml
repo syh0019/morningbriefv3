@@ -36,7 +36,6 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: 'package-lock.json'
 
       - name: 📦 Install Dependencies
         run: |
@@ -72,11 +71,34 @@ jobs:
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           GITHUB_PAGES_URL: ${{ secrets.GITHUB_PAGES_URL }}
           TZ: Asia/Seoul
+          NODE_ENV: production
         run: |
           echo "🚀 Starting Morning Briefing generation..."
-          npm start || {
+          echo "📋 Environment check:"
+          echo "  - Node version: $(node --version)"
+          echo "  - NPM version: $(npm --version)"
+          echo "  - Timezone: $TZ"
+          echo "  - Working directory: $(pwd)"
+          echo ""
+          echo "🔑 Checking environment variables (without revealing secrets):"
+          echo "  - GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:+SET}"
+          echo "  - GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:+SET}"
+          echo "  - GOOGLE_REFRESH_TOKEN: ${GOOGLE_REFRESH_TOKEN:+SET}"
+          echo "  - OPENAI_API_KEY: ${OPENAI_API_KEY:+SET}"
+          echo "  - WEATHER_API_KEY: ${WEATHER_API_KEY:+SET}"
+          echo "  - EMAIL_TO: ${EMAIL_TO:+SET}"
+          echo "  - EMAIL_FROM: ${EMAIL_FROM:+SET}"
+          echo "  - GITHUB_PAGES_URL: ${GITHUB_PAGES_URL:+SET}"
+          echo ""
+          echo "▶️ Running npm start..."
+          npm start 2>&1 | tee briefing.log || {
+            EXIT_CODE=$?
+            echo ""
             echo "❌ Morning Briefing generation failed!"
-            echo "Exit code: $?"
+            echo "Exit code: $EXIT_CODE"
+            echo ""
+            echo "📋 Last 50 lines of output:"
+            tail -n 50 briefing.log
             exit 1
           }
           echo "✅ Morning Briefing generation completed successfully"
