@@ -38,7 +38,7 @@ jobs:
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           TO_EMAILS: ${{ secrets.TO_EMAILS }}
           PAGES_URL: ${{ secrets.PAGES_URL }}
-          GMAIL_BRIEF_SUMMARY: 'true'
+          GMAIL_BRIEF_SUMMARY: 'false'
         run: npm start
       
       - name: Commit and push changes
