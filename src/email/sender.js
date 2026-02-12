@@ -11,14 +11,14 @@ import { logger } from '../utils/logger.js';
 export async function sendEmail(auth, subject, htmlContent) {
   try {
     const toEmails = process.env.TO_EMAILS;
-    const fromEmail = process.env.GOOGLE_USER_EMAIL;
+    const fromEmail = process.env.EMAIL_FROM;
 
     if (!toEmails) {
       throw new Error('TO_EMAILS 환경변수가 설정되지 않았습니다.');
     }
 
     if (!fromEmail) {
-      throw new Error('GOOGLE_USER_EMAIL 환경변수가 설정되지 않았습니다.');
+      throw new Error('EMAIL_FROM 환경변수가 설정되지 않았습니다.');
     }
 
     // 콤마로 구분된 이메일 주소 파싱

@@ -13,10 +13,10 @@ const DEFAULT_LON = '126.9780';
  */
 export async function getWeather() {
   try {
-    const apiKey = process.env.OPENWEATHER_API_KEY;
+    const apiKey = process.env.WEATHER_API_KEY;
     
     if (!apiKey) {
-      logger.warn('OPENWEATHER_API_KEY가 설정되지 않았습니다.');
+      logger.warn('WEATHER_API_KEY가 설정되지 않았습니다.');
       return null;
     }
 
