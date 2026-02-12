@@ -41,7 +41,7 @@ function generateAudioScript(data) {
   // 1. 날씨 (간략하게)
   if (weather) {
     script += `먼저 오늘의 날씨입니다. `;
-    script += `${weather.city} 현재 ${weather.temperature}도, ${weather.description}입니다. `;
+    script += `${weather.location || '서울'} 현재 ${weather.current || weather.temperature}도, ${weather.description}입니다. `;
     if (weather.fineDust) {
       script += `미세먼지는 ${weather.fineDust}입니다. `;
     }
@@ -55,8 +55,8 @@ function generateAudioScript(data) {
     if (calendar.today.length > 0) {
       script += `오늘 ${calendar.today.length}건의 일정이 있습니다. `;
       calendar.today.slice(0, 3).forEach((event, idx) => {
-        const time = event.start ? new Date(event.start.dateTime || event.start.date).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Seoul' }) : '';
-        script += `${time ? time + '에 ' : ''}${event.summary}. `;
+        const timeText = event.time && !event.isAllDay ? event.time : '';
+        script += `${timeText ? timeText + '에 ' : ''}${event.title}. `;
       });
     }
     
