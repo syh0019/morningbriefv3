@@ -93,6 +93,7 @@ function parseEmail(message) {
   snippet = maskSensitiveInfo(snippet);
 
   return {
+    id: message.id, // 메일 ID 추가
     from: parseFromAddress(from),
     subject: subject || '(제목 없음)',
     date: date,
@@ -199,7 +200,16 @@ export function formatGmailSection(emailSummary) {
     return '<p style="color: #999;">미읽음 메일을 불러오지 못했습니다.</p>';
   }
 
-  return `<div style="white-space: pre-line;">${escapeHtml(emailSummary)}</div>`;
+  // HTML 이스케이프 후 Gmail 링크를 클릭 가능한 링크로 변환
+  let formatted = escapeHtml(emailSummary);
+  
+  // Gmail 링크를 클릭 가능한 <a> 태그로 변환
+  formatted = formatted.replace(
+    /https:\/\/mail\.google\.com\/mail\/u\/0\/#inbox\/[a-zA-Z0-9]+/g,
+    (url) => `<a href="${url}" target="_blank" style="color: #1a73e8; text-decoration: none; font-weight: 500;">${url}</a>`
+  );
+
+  return `<div style="white-space: pre-line;">${formatted}</div>`;
 }
 
 /**

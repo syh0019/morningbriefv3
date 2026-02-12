@@ -138,6 +138,7 @@ export async function summarizeEmails(emails) {
       emailText += `From: ${email.from}\n`;
       emailText += `Subject: ${email.subject}\n`;
       emailText += `Date: ${email.date}\n`;
+      emailText += `Gmail Link: https://mail.google.com/mail/u/0/#inbox/${email.id}\n`;
       emailText += `Content: ${email.snippet.substring(0, 500)}\n\n`;
     });
 
@@ -151,7 +152,7 @@ ${emailText}
 📧 미읽음 메일 상세 요약 (총 ${emails.length}건)
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 
-${emails.slice(0, Math.min(15, emails.length)).map((_, idx) => `
+${emails.slice(0, Math.min(15, emails.length)).map((email, idx) => `
 ${idx + 1}. From: [보낸 사람]
    Subject: [제목 전체]
    Date: [날짜]
@@ -166,7 +167,7 @@ ${idx + 1}. From: [보낸 사람]
    - (왜 그런 액션이 필요한지 구체적으로 설명)
    - (우선순위: 높음/중간/낮음)
    
-   🔗 관련 링크/첨부파일: (있다면)
+   🔗 메일 바로가기: https://mail.google.com/mail/u/0/#inbox/${email.id}
    
 `).join('\n')}
 
@@ -256,6 +257,7 @@ export async function summarizeEmailsBrief(emails) {
       emailText += `From: ${email.from}\n`;
       emailText += `Subject: ${email.subject}\n`;
       emailText += `Date: ${email.date}\n`;
+      emailText += `Gmail Link: https://mail.google.com/mail/u/0/#inbox/${email.id}\n`;
       emailText += `Content: ${email.snippet.substring(0, 500)}\n\n`;
     });
 
@@ -268,15 +270,16 @@ ${emailText}
 - 각 줄은 가장 중요한 메일이나 핵심 내용을 담을 것
 - 간결하고 핵심만 전달
 - 한국어로 작성
+- 각 메일 마지막에 Gmail 바로가기 링크 추가
 
 **형식 예시:**
-1. [보낸사람]: [제목] - [한 줄 핵심 내용]
-2. [보낸사람]: [제목] - [한 줄 핵심 내용]
-3. [보낸사람]: [제목] - [한 줄 핵심 내용]
-4. [보낸사람]: [제목] - [한 줄 핵심 내용]
-5. [보낸사람]: [제목] - [한 줄 핵심 내용]
+1. [보낸사람]: [제목] - [한 줄 핵심 내용] (Gmail 바로가기: [링크])
+2. [보낸사람]: [제목] - [한 줄 핵심 내용] (Gmail 바로가기: [링크])
+3. [보낸사람]: [제목] - [한 줄 핵심 내용] (Gmail 바로가기: [링크])
+4. [보낸사람]: [제목] - [한 줄 핵심 내용] (Gmail 바로가기: [링크])
+5. [보낸사람]: [제목] - [한 줄 핵심 내용] (Gmail 바로가기: [링크])
 
-주의: 메일이 5개 미만이면 해당 개수만큼만 작성하고, 5개를 초과하면 가장 중요한 5개만 선별하세요.`;
+주의: 메일이 5개 미만이면 해당 개수만큼만 작성하고, 5개를 초과하면 가장 중요한 5개만 선별하세요. 각 메일에 제공된 Gmail Link를 반드시 포함하세요.`;
 
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
