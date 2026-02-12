@@ -1,165 +1,56 @@
-name: Morning Briefing
+name: Generate Morning Briefing
 
 on:
-  # 매일 07:00 KST (22:00 UTC 전날) 실행
   schedule:
-    - cron: '0 22 * * *'  # UTC 22:00 = KST 07:00 (다음날)
+    # 매일 KST 07:00 (UTC 22:00 전날) 실행
+    - cron: '0 22 * * *'
   
-  # 수동 실행 지원
+  # 수동 실행 가능
   workflow_dispatch:
 
-# GitHub Pages 배포 권한
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-# 동시 실행 방지
-concurrency:
-  group: "morning-briefing"
-  cancel-in-progress: false
-
 jobs:
-  briefing:
-    name: Generate Morning Briefing
+  generate-briefing:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    
+    permissions:
+      contents: write
     
     steps:
-      - name: 📥 Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # 전체 히스토리 (아카이브용)
-
-      - name: 🔧 Setup Node.js 20
+      
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-
-      - name: 📦 Install Dependencies
-        run: |
-          echo "📋 Checking package files..."
-          ls -la package*.json
-          echo ""
-          echo "🔧 Running npm ci..."
-          npm ci
-          echo "✅ Dependencies installed successfully"
-
-      - name: 🔐 Setup Environment Variables
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Generate Morning Briefing
         env:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
           EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-          GITHUB_PAGES_URL: ${{ secrets.GITHUB_PAGES_URL }}
+          TO_EMAILS: ${{ secrets.TO_EMAILS }}
+          PAGES_URL: ${{ secrets.PAGES_URL }}
+          GMAIL_BRIEF_SUMMARY: 'true'
+        run: npm start
+      
+      - name: Commit and push changes
         run: |
-          echo "Environment variables loaded"
-          echo "Total variables: $(env | grep -v "GITHUB\|PATH\|HOME" | wc -l)"
-
-      - name: 🌅 Run Morning Briefing
-        env:
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
-          EMAIL_TO: ${{ secrets.EMAIL_TO }}
-          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-          GITHUB_PAGES_URL: ${{ secrets.GITHUB_PAGES_URL }}
-          TZ: Asia/Seoul
-          NODE_ENV: production
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add docs/
+          git diff --staged --quiet || git commit -m "🌅 Morning Briefing $(date +'%Y-%m-%d')"
+          git push
+      
+      - name: Notify on failure
+        if: failure()
         run: |
-          echo "🚀 Starting Morning Briefing generation..."
-          echo "📋 Environment check:"
-          echo "  - Node version: $(node --version)"
-          echo "  - NPM version: $(npm --version)"
-          echo "  - Timezone: $TZ"
-          echo "  - Working directory: $(pwd)"
-          echo ""
-          echo "🔑 Checking environment variables (without revealing secrets):"
-          [ -n "$GOOGLE_CLIENT_ID" ] && echo "  - GOOGLE_CLIENT_ID: SET" || echo "  - GOOGLE_CLIENT_ID: NOT SET"
-          [ -n "$GOOGLE_CLIENT_SECRET" ] && echo "  - GOOGLE_CLIENT_SECRET: SET" || echo "  - GOOGLE_CLIENT_SECRET: NOT SET"
-          [ -n "$GOOGLE_REFRESH_TOKEN" ] && echo "  - GOOGLE_REFRESH_TOKEN: SET" || echo "  - GOOGLE_REFRESH_TOKEN: NOT SET"
-          [ -n "$OPENAI_API_KEY" ] && echo "  - OPENAI_API_KEY: SET" || echo "  - OPENAI_API_KEY: NOT SET"
-          [ -n "$WEATHER_API_KEY" ] && echo "  - WEATHER_API_KEY: SET" || echo "  - WEATHER_API_KEY: NOT SET"
-          [ -n "$EMAIL_TO" ] && echo "  - EMAIL_TO: SET" || echo "  - EMAIL_TO: NOT SET"
-          [ -n "$EMAIL_FROM" ] && echo "  - EMAIL_FROM: SET" || echo "  - EMAIL_FROM: NOT SET"
-          [ -n "$GITHUB_PAGES_URL" ] && echo "  - GITHUB_PAGES_URL: SET" || echo "  - GITHUB_PAGES_URL: NOT SET"
-          echo ""
-          echo "▶️ Running npm start..."
-          npm start 2>&1 | tee briefing.log || {
-            EXIT_CODE=$?
-            echo ""
-            echo "❌ Morning Briefing generation failed!"
-            echo "Exit code: $EXIT_CODE"
-            echo ""
-            echo "📋 Last 50 lines of output:"
-            tail -n 50 briefing.log
-            exit 1
-          }
-          echo "✅ Morning Briefing generation completed successfully"
-
-      - name: 📊 Check Output Files
-        run: |
-          echo "Generated files:"
-          ls -lh docs/
-          if [ -f docs/today.html ]; then
-            echo "✅ today.html exists ($(stat -f%z docs/today.html 2>/dev/null || stat -c%s docs/today.html) bytes)"
-          else
-            echo "❌ today.html not found"
-          fi
-          if [ -f docs/today.mp3 ]; then
-            echo "✅ today.mp3 exists ($(stat -f%z docs/today.mp3 2>/dev/null || stat -c%s docs/today.mp3) bytes)"
-          else
-            echo "⚠️ today.mp3 not found (audio generation may have failed)"
-          fi
-
-      - name: 🚀 Deploy to GitHub Pages
-        if: success()
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          
-          # docs 폴더가 있는지 확인
-          if [ -d "docs" ]; then
-            git add docs/
-            
-            # 변경사항이 있는 경우에만 커밋
-            if git diff --staged --quiet; then
-              echo "No changes to commit"
-            else
-              git commit -m "🌅 Morning Briefing $(date +'%Y-%m-%d %H:%M KST')"
-              git push
-              echo "✅ Successfully deployed to GitHub Pages"
-            fi
-          else
-            echo "❌ docs folder not found"
-            exit 1
-          fi
-
-      - name: 📝 Upload Artifacts (for debugging)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: briefing-outputs-${{ github.run_number }}
-          path: |
-            docs/
-          retention-days: 7
-
-  # 실패 알림 (선택)
-  notify-failure:
-    name: Notify on Failure
-    runs-on: ubuntu-latest
-    needs: briefing
-    if: failure()
-    steps:
-      - name: 📧 Send Failure Notification
-        run: |
-          echo "Morning Briefing workflow failed!"
-          echo "Run ID: ${{ github.run_id }}"
-          echo "Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          # 여기에 Slack, Discord, Email 등의 알림 로직 추가 가능
+          echo "❌ Morning Briefing 생성 실패"
+          echo "로그를 확인해주세요: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
