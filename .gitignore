@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Credentials
+credentials.json
+token.json
+
+# Build outputs (GitHub Actions에서 생성)
+# docs 폴더는 배포용이므로 gitignore하지 않음
+
+# Temporary files
+tmp/
+temp/
+*.tmp

@@ -1,0 +1,36 @@
+{
+  "name": "morning-briefing",
+  "version": "1.0.0",
+  "description": "GitHub Actions 기반 자동 Morning Briefing 시스템",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "get-token": "node src/auth/getRefreshToken.js",
+    "test:audio": "node scripts/test-audio.js",
+    "test:web": "node scripts/test-web.js",
+    "test:email": "node scripts/test-email-summary.js"
+  },
+  "keywords": [
+    "morning-briefing",
+    "automation",
+    "github-actions",
+    "google-calendar",
+    "gmail",
+    "openai"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "googleapis": "^131.0.0",
+    "openai": "^4.67.3",
+    "axios": "^1.7.9",
+    "rss-parser": "^3.13.0",
+    "luxon": "^3.5.0",
+    "dotenv": "^16.4.5",
+    "open": "^10.1.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

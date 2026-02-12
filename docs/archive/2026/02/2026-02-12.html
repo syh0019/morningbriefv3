@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Morning Briefing 2026-02-12</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #202124;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      min-height: 100vh;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.3);
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .header p {
+      font-size: 18px;
+      opacity: 0.95;
+      font-weight: 500;
+    }
+    
+    .audio-player {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 20px auto 0;
+      max-width: 400px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .audio-player h3 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #ffffff;
+      text-align: center;
+    }
+    
+    .audio-player audio {
+      width: 100%;
+      height: 40px;
+      border-radius: 20px;
+      outline: none;
+    }
+    
+    .section {
+      padding: 40px 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+    }
+    
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #202124;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #1a73e8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-content {
+      font-size: 16px;
+      color: #5f6368;
+      line-height: 1.8;
+    }
+    
+    .footer {
+      background-color: #f8f9fa;
+      padding: 30px 20px;
+      text-align: center;
+      color: #5f6368;
+      font-size: 14px;
+    }
+    
+    .footer p {
+      margin: 8px 0;
+    }
+    
+    .footer a {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .footer a:hover {
+      text-decoration: underline;
+    }
+    
+    /* 반응형 디자인 */
+    @media only screen and (max-width: 600px) {
+      .header h1 {
+        font-size: 28px;
+      }
+      
+      .header p {
+        font-size: 16px;
+      }
+      
+      .section {
+        padding: 30px 16px;
+      }
+      
+      .section-title {
+        font-size: 24px;
+      }
+      
+      .section-content {
+        font-size: 15px;
+      }
+      
+      .audio-player {
+        padding: 16px;
+        margin: 16px auto 0;
+      }
+    }
+    
+    /* 다크모드 대응 */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+      }
+      
+      .container {
+        background-color: #1a202c;
+      }
+      
+      .section-title {
+        color: #e2e8f0;
+        border-bottom-color: #4299e1;
+      }
+      
+      .section-content {
+        color: #a0aec0;
+      }
+      
+      .footer {
+        background-color: #2d3748;
+        color: #a0aec0;
+      }
+    }
+    
+    /* 프린트 최적화 */
+    @media print {
+      body {
+        background: white;
+      }
+      
+      .container {
+        box-shadow: none;
+      }
+      
+      .header {
+        position: static;
+        background: #667eea;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .audio-player {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>☀️ Morning Briefing</h1>
+      <p>2026년 2월 12일 (목)</p>
+      
+      
+      <!-- Audio Player -->
+      <div class="audio-player">
+        <h3>🎧 오디오로 듣기</h3>
+        <audio controls preload="metadata">
+          <source src="./today.mp3" type="audio/mpeg">
+          Your browser does not support the audio element.
+        </audio>
+      </div>
+      
+    </div>
+
+    <!-- Weather Section -->
+    <div class="section">
+      <div class="section-title">🌤️ 오늘의 날씨</div>
+      <div class="section-content">
+        <div style="display: flex; align-items: center; gap: 20px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; color: white;"><div style="font-size: 48px;">🌙</div><div style="flex: 1;"><div style="font-size: 32px; font-weight: bold;">3°C</div><div style="font-size: 14px; opacity: 0.9;">맑음</div><div style="font-size: 14px; margin-top: 4px; opacity: 0.9;">최고 3°C / 최저 0°C</div></div><div style="text-align: right; font-size: 13px;"><div>💧 강수 0%</div><div style="margin-top: 4px;">💨 2.57m/s</div><div style="margin-top: 4px;">💦 습도 87%</div></div></div>
+      </div>
+    </div>
+
+    <!-- Calendar Section -->
+    <div class="section">
+      <div class="section-title">📅 일정</div>
+      <div class="section-content">
+        <h3 style="color: #1a73e8; margin-top: 0;">📅 오늘</h3><ul style="list-style: none; padding: 0;"><li style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px;"><div style="font-weight: 600; color: #202124;">17:00 ~ 19:00</div><div style="margin-top: 4px; font-size: 15px;">개인 운동</div><div style="margin-top: 4px; color: #5f6368; font-size: 12px;">📆 Hyeok private</div></li></ul><h3 style="color: #1a73e8; margin-top: 20px;">📅 내일</h3><ul style="list-style: none; padding: 0;"><li style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px;"><div style="font-weight: 600; color: #202124;">10:00 ~ 11:30</div><div style="margin-top: 4px; font-size: 15px;">WPC 월간보고</div><div style="margin-top: 4px; color: #5f6368; font-size: 12px;">📆 일정</div><div style="margin-top: 4px; color: #5f6368; font-size: 13px;">📍 세계본사 회의실 혜움10</div></li><li style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px;"><div style="font-weight: 600; color: #202124;">16:00 ~ 17:00</div><div style="margin-top: 4px; font-size: 15px;">디지털 플랫폼혁신팀 티타임(w/안종훈님)</div><div style="margin-top: 4px; color: #5f6368; font-size: 12px;">📆 일정</div><div style="margin-top: 4px; color: #5f6368; font-size: 13px;">📍 5층 까멜리아-&gt;3층 중회의실2(3코어)</div></li><li style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px;"><div style="font-weight: 600; color: #202124;">18:30 ~ 20:30</div><div style="margin-top: 4px; font-size: 15px;">막썰이회 신용산점 w/매형</div><div style="margin-top: 4px; color: #5f6368; font-size: 12px;">📆 Hyeok private</div></li></ul>
+      </div>
+    </div>
+
+    <!-- Gmail Section -->
+    <div class="section">
+      <div class="section-title">📧 미읽음 메일</div>
+      <div class="section-content">
+        <div style="white-space: pre-line;">1. OpenAI: Your API usage limits have increased - 사용량에 따라 API 한도가 Usage Tier 1으로 증가했습니다.  
+2. OpenAI: Your OpenAI API account has been funded - 신용카드로 $33.00이 청구되어 API 크레딧 잔액이 충전되었습니다.  
+3. OB MCC: MCC 알럼나이를 위한 채널 공지 - MCC 네트워크 활성화를 위한 OB 세션 및 뉴스레터 제작 계획이 있습니다.  
+4. NEWNEEK: 대형마트, 앞으로 새벽배송 시작한다고요? - 대형마트의 새벽배송 도입과 관련된 법적 변화에 대한 내용입니다.  
+5. NEWNEEK: 전 세계 뒤흔든 &#039;엡스타인 파일&#039; 내용·전망 총정리 - 엡스타인 파일에 대한 관심이 높아지고 있으며, 관련 투표 결과를 공유합니다.</div>
+      </div>
+    </div>
+
+    <!-- News Summary Section -->
+    <div class="section">
+      <div class="section-title">📰 뉴스 브리핑</div>
+      <div class="section-content">
+        <div style="white-space: pre-line; line-height: 1.6;"><hr style="border: none; border-top: 2px solid #e0e0e0; margin: 20px 0;">
+<h3 style="color: #1a73e8; margin-top: 20px;">📊 A) Macro Dashboard</h3>
+<hr style="border: none; border-top: 2px solid #e0e0e0; margin: 20px 0;">
+현재 시장은 위험 회피(Risk-off) 분위기로 전환되고 있으며, 금리는 동결된 상태에서 높은 변동성을 보이고 있습니다. 원·달러 환율이 급등해 외환 시장에 영향을 미치고 있으며, 금값은 지정학적 불안으로 인해 지속적인 상승세를 보이고 있습니다. <br/><br/><hr style="border: none; border-top: 2px solid #e0e0e0; margin: 20px 0;">
+<h3 style="color: #ea4335; margin-top: 20px;">🔥 B) Top Drivers</h3><br/><br/><h4 style="color: #202124; margin-top: 15px;">1️⃣ 소형모듈원자로 개발 촉진 특별법, 국회 본회의 통과</h4>
+<div style="margin-left: 20px; margin-top: 5px;">• 핵심: 소형모듈원자로 개발을 촉진하기 위한 특별법이 통과되면서 에너지 산업에 긍정적인 신호를 보냅니다. 이는 원자력 관련 기업들의 성장 가능성을 높일 수 있습니다.</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시장영향: 주식</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 링크: [기사 링크](https://news.google.com/rss/articles/CBMiVEFVX3lxTE83N29ERU9LcXh0NDFYWWFRSzgxUWI1NUN3R2tIYzN2c3FDSE4tYkR3Slhra3oxZUI0cjhjM2IzNzBOZkxxTHVWTnd4bmlCeGk4elo5TA?oc=5)</div><br/><br/><h4 style="color: #202124; margin-top: 15px;">2️⃣ 원·달러 환율 급등</h4>
+<div style="margin-left: 20px; margin-top: 5px;">• 핵심: 원·달러 환율이 외환위기 수준으로 급등하면서 한국 경제에 부담을 주고 있습니다. 이는 수출입 기업의 수익성에 부정적 영향을 미칠 수 있습니다.</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시장영향: FX</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 링크: [기사 링크](https://news.google.com/rss/articles/CBMiU0FVX3lxTFA0NDltTVphckF2dHcwM0JBYmY4eDNvSFl4MnBuM2VpY0FsaEd3TnozZXlIYUJGRzZsWV9FYkdOVDZjZER2MXR4VUF3MGMtdVhTWDNN?oc=5)</div><br/><br/><h4 style="color: #202124; margin-top: 15px;">3️⃣ 연준 금리인하 급선회</h4>
+<div style="margin-left: 20px; margin-top: 5px;">• 핵심: 연준이 금리 인하 방향으로 급선회하면서 금융 시장의 기대감이 높아지고 있습니다. 이는 주식 시장에 긍정적인 영향을 줄 것으로 예상됩니다.</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시장영향: 주식</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 링크: [기사 링크](https://news.google.com/rss/articles/CBMiiAFBVV95cUxNX3ZsUC1QODk0cGtXXzFOa0dlaUhKUGNtbUpRSVUtY2FrQzJUZTVCZExNbzV3Y2hLUXlOanR6a2VyMFdkSDh4ZnpmbTdMdFBxVDVwTWRvRl9faHFqTkJSNk54Wlg4dW42N0pXeWRLVE9lcWZndGhmLVZ4TUdFREFER0g0TWpacHhI?oc=5)</div><br/><br/><h4 style="color: #202124; margin-top: 15px;">4️⃣ 소비심리 개선</h4>
+<div style="margin-left: 20px; margin-top: 5px;">• 핵심: 경제와 증시의 기대감으로 소비심리가 개선되며, 이는 소비 관련 주식에 긍정적인 영향을 미칠 수 있습니다. 소비자 지출이 증가할 것으로 예상됩니다.</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시장영향: 주식</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 링크: [기사 링크](https://news.google.com/rss/articles/CBMiUkFVX3lxTE1PSHZxVlNIcGJjT3MtY3ROVDJnenZaWS0yTXp2WnJzQ1pyaml1RUZ3eHJLZFBpem5sdzdXOWRxUVlZZXdwLU9jaWlOMUNKbEZRNGc?oc=5)</div><br/><br/><h4 style="color: #202124; margin-top: 15px;">5️⃣ 지정학적 불안 속 금값 상승</h4>
+<div style="margin-left: 20px; margin-top: 5px;">• 핵심: 지정학적 불안으로 인해 금값이 지속적으로 상승하며, 투자자들이 안전 자산으로서 금에 대한 선호를 더욱 강화하고 있습니다. </div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시장영향: 원자재</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 링크: [기사 링크](https://news.google.com/rss/articles/CBMingFBVV95cUxPZVUxUWtaX2xtcjE0WXBXSjhDZmFxVmxqRDdIVThKVjN4Mk8xdGJ6QkUtYWltVjZHSTJ4aXJVbFRBRVU3SU5UOGUwbFN6czl5N0ViTjVOMU5YTk9HVHQ4TDFEY0Q0NjRIVXcwZElHZElNSTE5OHRXQ0szYW45WFFCNWh3OVNUYlVld0dUYkdxVzJEdHo4V2g2d080ZWpRQdIBsgFBVV95cUxPTDdMWTB3eHNBMy1nbHpWLS1EcVBiRHB2VzRoVzFEZkJ1b0V5Y3dpTmVDSTQ4SWtqYUI3SHdheEZRQ3AyTl9xNzVPQTR2N0VfcUdZVWtTTDZmd21NR1pEWmpDV3l3SU9LQnNnTWwzM2hPTGNFNDg1TDEzc3FxUEFsYWNvelJ5OVlncnZGNjBSLUwybkFrWlo0Q0RPRHZ6bXpRR1lfc1BXOUNRSllwQTNuTzVR?oc=5)</div><br/><br/><hr style="border: none; border-top: 2px solid #e0e0e0; margin: 20px 0;">
+<h3 style="color: #34a853; margin-top: 20px;">📌 C) 카테고리별 한 줄</h3>
+<strong style="color: #5f6368;">[KR 정책]</strong> 소형모듈원자로 개발 촉진 특별법 통과로 에너지 산업에 긍정적인 신호.
+<strong style="color: #5f6368;">[KR 경제/시장]</strong> 원·달러 환율 급등으로 한국 경제에 부담 증가.
+<strong style="color: #5f6368;">[Tech]</strong> 빅테크 기업들이 AI와 반도체 분야에서 강력한 협력 및 경쟁을 추진.
+<strong style="color: #5f6368;">[Global]</strong> 금값 상승세가 지속되며 안전 자산 선호가 강화.<br/><br/><hr style="border: none; border-top: 2px solid #e0e0e0; margin: 20px 0;">
+<h3 style="color: #fbbc04; margin-top: 20px;">✅ D) 오늘의 체크포인트</h3>
+1. [모니터링 이벤트]
+<div style="margin-left: 20px; margin-top: 5px;">• 시나리오 A: 연준이 금리를 인하할 경우 주식 시장에 긍정적 영향.</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시나리오 B: 환율 상승이 지속될 경우 기업 수익성 악화.</div><br/><br/>2. [모니터링 이벤트]
+<div style="margin-left: 20px; margin-top: 5px;">• 시나리오 A: 소비심리가 추가로 회복될 경우 소비 관련 주식 상승.</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시나리오 B: 금값이 계속 상승할 경우 원자재 투자 증가.</div><br/><br/>3. [모니터링 이벤트]
+<div style="margin-left: 20px; margin-top: 5px;">• 시나리오 A: 소형모듈원자로 개발이 가속화될 경우 관련 기업 주가 상승.</div>
+<div style="margin-left: 20px; margin-top: 5px;">• 시나리오 B: 정치적 불안정성이 지속될 경우 시장 변동성 확대.</div></div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Morning Briefing v3</strong></p>
+      <p>자동 생성된 브리핑입니다.</p>
+      <p>GitHub Actions에서 매일 아침 07:00 KST에 업데이트됩니다.</p>
+      <p style="margin-top: 16px;">
+        <a href="https://github.com/your-username/morningbriefv3" target="_blank">GitHub Repository</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>

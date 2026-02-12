@@ -1,0 +1,129 @@
+name: Morning Briefing
+
+on:
+  # 매일 07:00 KST (22:00 UTC 전날) 실행
+  schedule:
+    - cron: '0 22 * * *'  # UTC 22:00 = KST 07:00 (다음날)
+  
+  # 수동 실행 지원
+  workflow_dispatch:
+
+# GitHub Pages 배포 권한
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# 동시 실행 방지
+concurrency:
+  group: "morning-briefing"
+  cancel-in-progress: false
+
+jobs:
+  briefing:
+    name: Generate Morning Briefing
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 전체 히스토리 (아카이브용)
+
+      - name: 🔧 Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🔐 Setup Environment Variables
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          GITHUB_PAGES_URL: ${{ secrets.GITHUB_PAGES_URL }}
+        run: |
+          echo "Environment variables loaded"
+          echo "Total variables: $(env | grep -v "GITHUB\|PATH\|HOME" | wc -l)"
+
+      - name: 🌅 Run Morning Briefing
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          GITHUB_PAGES_URL: ${{ secrets.GITHUB_PAGES_URL }}
+          TZ: Asia/Seoul
+        run: npm start
+
+      - name: 📊 Check Output Files
+        run: |
+          echo "Generated files:"
+          ls -lh docs/
+          if [ -f docs/today.html ]; then
+            echo "✅ today.html exists ($(stat -f%z docs/today.html 2>/dev/null || stat -c%s docs/today.html) bytes)"
+          else
+            echo "❌ today.html not found"
+          fi
+          if [ -f docs/today.mp3 ]; then
+            echo "✅ today.mp3 exists ($(stat -f%z docs/today.mp3 2>/dev/null || stat -c%s docs/today.mp3) bytes)"
+          else
+            echo "⚠️ today.mp3 not found (audio generation may have failed)"
+          fi
+
+      - name: 🚀 Deploy to GitHub Pages
+        if: success()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # docs 폴더가 있는지 확인
+          if [ -d "docs" ]; then
+            git add docs/
+            
+            # 변경사항이 있는 경우에만 커밋
+            if git diff --staged --quiet; then
+              echo "No changes to commit"
+            else
+              git commit -m "🌅 Morning Briefing $(date +'%Y-%m-%d %H:%M KST')"
+              git push
+              echo "✅ Successfully deployed to GitHub Pages"
+            fi
+          else
+            echo "❌ docs folder not found"
+            exit 1
+          fi
+
+      - name: 📝 Upload Artifacts (for debugging)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: briefing-outputs-${{ github.run_number }}
+          path: |
+            docs/
+          retention-days: 7
+
+  # 실패 알림 (선택)
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: briefing
+    if: failure()
+    steps:
+      - name: 📧 Send Failure Notification
+        run: |
+          echo "Morning Briefing workflow failed!"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          # 여기에 Slack, Discord, Email 등의 알림 로직 추가 가능
